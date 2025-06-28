@@ -95,6 +95,7 @@
   <div id="main" style="display:none">
     <p>مرحبًا <strong id="nameDisplay"></strong>!</p>
     <div class="status">
+      <button onclick="location.reload()">تحديث القائمة</button>
       <button class="on" onclick="setStatus('متواجد')">✅ متواجد</button>
       <button class="off" onclick="setStatus('غير متواجد')">❌ طلعت</button>
     </div>
@@ -174,8 +175,7 @@
     }
 
     const presentList = document.getElementById("presentList");
-    const joinSound = new Audio("https://www.soundjay.com/buttons/beep-07.mp3");
-    const leaveSound = new Audio("https://www.soundjay.com/buttons/beep-10.mp3");
+    
     let previousUsers = new Set();
     const presenceRef = ref(db, 'presence');
 
@@ -190,7 +190,7 @@
           const minutesAgo = Math.floor((Date.now() - info.timestamp) / 60000);
           li.textContent = `${user} - منذ ${minutesAgo} دقيقة`;
           currentUsers.add(user);
-          if (!previousUsers.has(user)) joinSound.play();
+          
           if (username) {
             const kickBtn = document.createElement("button");
             kickBtn.textContent = "❌ غادر";
@@ -200,9 +200,7 @@
           presentList.appendChild(li);
         }
       }
-      for (const name of previousUsers) {
-        if (!currentUsers.has(name)) leaveSound.play();
-      }
+      
       previousUsers = currentUsers;
     });
   </script>
