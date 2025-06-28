@@ -190,7 +190,7 @@
           const minutesAgo = Math.floor((Date.now() - info.timestamp) / 60000);
           li.textContent = `${user} - منذ ${minutesAgo} دقيقة`;
           currentUsers.add(user);
-          if (!previousUsers.has(user)) audio.play();
+          if (!previousUsers.has(user)) joinSound.play();
           if (username) {
             const kickBtn = document.createElement("button");
             kickBtn.textContent = "❌ غادر";
