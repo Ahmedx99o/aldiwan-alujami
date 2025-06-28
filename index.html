@@ -174,16 +174,22 @@
     }
 
     const presentList = document.getElementById("presentList");
+    const audio = new Audio("https://www.soundjay.com/buttons/beep-07.mp3");
+    let previousUsers = new Set();
     const presenceRef = ref(db, 'presence');
 
     onValue(presenceRef, (snapshot) => {
       const data = snapshot.val() || {};
       const entries = Object.entries(data);
       presentList.innerHTML = '';
+      const currentUsers = new Set();
       for (const [user, info] of entries) {
         if (info.status === 'متواجد') {
           const li = document.createElement("li");
-          li.textContent = user;
+          const minutesAgo = Math.floor((Date.now() - info.timestamp) / 60000);
+          li.textContent = `${user} - منذ ${minutesAgo} دقيقة`;
+          currentUsers.add(user);
+          if (!previousUsers.has(user)) audio.play();
           if (username) {
             const kickBtn = document.createElement("button");
             kickBtn.textContent = "❌ غادر";
@@ -193,6 +199,7 @@
           presentList.appendChild(li);
         }
       }
+      previousUsers = currentUsers;
     });
   </script>
 <footer style="margin-top: 50px; font-size: 0.9rem; opacity: 0.6;">جميع الحقوق محفوظة © أحمد آل ناصر</footer>
