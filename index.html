@@ -174,7 +174,8 @@
     }
 
     const presentList = document.getElementById("presentList");
-    const audio = new Audio("https://www.soundjay.com/buttons/beep-07.mp3");
+    const joinSound = new Audio("https://www.soundjay.com/buttons/beep-07.mp3");
+    const leaveSound = new Audio("https://www.soundjay.com/buttons/beep-10.mp3");
     let previousUsers = new Set();
     const presenceRef = ref(db, 'presence');
 
@@ -198,6 +199,9 @@
           }
           presentList.appendChild(li);
         }
+      }
+      for (const name of previousUsers) {
+        if (!currentUsers.has(name)) leaveSound.play();
       }
       previousUsers = currentUsers;
     });
