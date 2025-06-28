@@ -98,9 +98,10 @@
       <button onclick="location.reload()">تحديث القائمة</button>
       <button class="on" onclick="setStatus('متواجد')">✅ متواجد</button>
       <button class="off" onclick="setStatus('غير متواجد')">❌ طلعت</button>
+      
     </div>
     <div id="list">
-      <h3>المتواجدون الآن:</h3>
+      <h3>المتواجدون الآن: <span id="countDisplay">0</span></h3>
       <ul id="presentList"></ul>
     </div>
     <div class="extra-controls">
@@ -209,6 +210,7 @@
         }
       }
       
+      document.getElementById("countDisplay").textContent = currentUsers.size;
       previousUsers = currentUsers;
     });
   </script>
