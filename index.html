@@ -67,6 +67,14 @@
       border-radius: 15px;
       box-shadow: 0 0 15px rgba(255,255,255,0.05);
     }
+    #list button {
+      margin-right: 10px;
+      background-color: #444;
+      color: #fff;
+      padding: 4px 10px;
+      font-size: 0.9rem;
+      border-radius: 5px;
+    }
     @media screen and (max-width: 600px) {
       h1 { font-size: 1.5rem; }
       button { width: 90%; }
@@ -82,7 +90,7 @@
   <div id="main" style="display:none">
     <p>مرحبًا <strong id="nameDisplay"></strong>!</p>
     <div class="status">
-      <button class="on" onclick="setStatus('متواجد')">✅ وصلت</button>
+      <button class="on" onclick="setStatus('متواجد')">✅ متواجد</button>
       <button class="off" onclick="setStatus('غير متواجد')">❌ طلعت</button>
     </div>
     <div id="list">
@@ -136,6 +144,13 @@
       });
     };
 
+    function forceStatusOff(targetUser) {
+      set(ref(db, 'presence/' + targetUser), {
+        status: 'غير متواجد',
+        timestamp: Date.now()
+      });
+    }
+
     const presentList = document.getElementById("presentList");
     const presenceRef = ref(db, 'presence');
 
@@ -147,6 +162,13 @@
         if (info.status === 'متواجد') {
           const li = document.createElement("li");
           li.textContent = user;
+          // إذا كنت نفس المستخدم الحالي، أضف زر تعديل للآخرين
+          if (username) {
+            const kickBtn = document.createElement("button");
+            kickBtn.textContent = "❌ غادر";
+            kickBtn.onclick = () => forceStatusOff(user);
+            li.appendChild(kickBtn);
+          }
           presentList.appendChild(li);
         }
       }
