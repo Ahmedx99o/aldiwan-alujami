@@ -75,6 +75,11 @@
       font-size: 0.9rem;
       border-radius: 5px;
     }
+    .extra-controls {
+      margin-top: 40px;
+      border-top: 1px solid #444;
+      padding-top: 20px;
+    }
     @media screen and (max-width: 600px) {
       h1 { font-size: 1.5rem; }
       button { width: 90%; }
@@ -96,6 +101,14 @@
     <div id="list">
       <h3>المتواجدون الآن:</h3>
       <ul id="presentList"></ul>
+    </div>
+    <div class="extra-controls">
+      <h3>🧑‍🤝‍🧑 تسجيل حضور لشخص آخر</h3>
+      <input type="text" id="otherName" placeholder="اسم الشخص الآخر" />
+      <div>
+        <button class="on" onclick="setOtherStatus('متواجد')">✅ متواجد</button>
+        <button class="off" onclick="setOtherStatus('غير متواجد')">❌ طلعت</button>
+      </div>
     </div>
   </div>
 
@@ -144,6 +157,15 @@
       });
     };
 
+    window.setOtherStatus = function(status) {
+      const otherName = document.getElementById("otherName").value.trim();
+      if (!otherName) return;
+      set(ref(db, 'presence/' + otherName), {
+        status: status,
+        timestamp: Date.now()
+      });
+    };
+
     function forceStatusOff(targetUser) {
       set(ref(db, 'presence/' + targetUser), {
         status: 'غير متواجد',
@@ -162,7 +184,6 @@
         if (info.status === 'متواجد') {
           const li = document.createElement("li");
           li.textContent = user;
-          // إذا كنت نفس المستخدم الحالي، أضف زر تعديل للآخرين
           if (username) {
             const kickBtn = document.createElement("button");
             kickBtn.textContent = "❌ غادر";
@@ -174,5 +195,6 @@
       }
     });
   </script>
+<footer style="margin-top: 50px; font-size: 0.9rem; opacity: 0.6;">جميع الحقوق محفوظة © أحمد آل ناصر</footer>
 </body>
 </html>
