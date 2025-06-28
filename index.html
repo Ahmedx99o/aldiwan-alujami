@@ -187,8 +187,16 @@
       for (const [user, info] of entries) {
         if (info.status === 'متواجد') {
           const li = document.createElement("li");
-          const minutesAgo = Math.floor((Date.now() - info.timestamp) / 60000);
-          li.textContent = `${user} - منذ ${minutesAgo} دقيقة`;
+          const diffMs = Date.now() - info.timestamp;
+          const minutesAgo = Math.floor(diffMs / 60000);
+          const hours = Math.floor(minutesAgo / 60);
+          const remainingMinutes = minutesAgo % 60;
+          const timeText = minutesAgo < 60
+            ? `${minutesAgo} دقيقة`
+            : (remainingMinutes > 0
+              ? `${hours} ساعة و${remainingMinutes} دقيقة`
+              : `${hours} ساعة`);
+          li.textContent = `${user} - منذ ${timeText}`;
           currentUsers.add(user);
           
           if (username) {
