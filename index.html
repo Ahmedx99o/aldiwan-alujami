@@ -130,13 +130,24 @@
       nameInputDiv.style.display = 'none';
       mainDiv.style.display = 'block';
       checkAndAutoSetStatus(() => {
-        nameInputDiv.style.display = 'none';
-        mainDiv.style.display = 'block';
-      }, () => {
-        alert("أنت خارج نطاق الموقع، لم يتم تسجيل حضورك.");
-        localStorage.removeItem("name");
-        username = "";
+  nameInputDiv.style.display = 'none';
+  mainDiv.style.display = 'block';
+}, () => {
+  alert("أنت خارج نطاق الموقع، لم يتم تسجيل حضورك.");
+  localStorage.removeItem("name");
+  username = "";
+});
+
+setInterval(() => {
+  if (username) {
+    checkAndAutoSetStatus(() => {}, () => {
+      set(ref(db, 'presence/' + username), {
+        status: 'غير متواجد',
+        timestamp: Date.now()
       });
+    });
+  }
+}, 600000); // كل 10 دقائق
     }
 
     window.saveName = function() {
@@ -228,7 +239,7 @@
         const targetLat = 26.554944;
         const targetLon = 49.947083;
         const distance = getDistanceFromLatLonInMeters(lat, lon, targetLat, targetLon);
-        if (distance < 1000) {
+        if (distance < 50) {
           set(ref(db, 'presence/' + username), {
             status: 'متواجد',
             timestamp: Date.now()
