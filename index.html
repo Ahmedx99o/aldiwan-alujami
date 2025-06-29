@@ -204,7 +204,7 @@
         const targetLat = 26.554944;
         const targetLon = 49.947083;
         const distance = getDistanceFromLatLonInMeters(lat, lon, targetLat, targetLon);
-        if (distance < 50) {
+        if (distance < 1000) {
           set(ref(db, 'presence/' + username), {
             status: 'متواجد',
             timestamp: Date.now()
