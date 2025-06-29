@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>حضور الجلسة</title>
   <script type="module" src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js"></script>
+
+
+</script>
   <script type="module" src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js"></script>
   <style>
     :root {
@@ -96,9 +99,7 @@
     <p>مرحبًا <strong id="nameDisplay"></strong>!</p>
     <div class="status">
       <button onclick="location.reload()">تحديث القائمة</button>
-      <button class="on" onclick="setStatus('متواجد')">✅ متواجد</button>
-      <button class="off" onclick="setStatus('غير متواجد')">❌ طلعت</button>
-    </div>
+</div>
     <div id="list">
       <h3>المتواجدون الآن: <span id="countDisplay">0</span></h3>
       <ul id="presentList"></ul>
@@ -122,7 +123,7 @@
       authDomain: "diwan-al-ajami.firebaseapp.com",
       databaseURL: "https://diwan-al-ajami-default-rtdb.firebaseio.com",
       projectId: "diwan-al-ajami",
-      storageBucket: "diwan-al-ajami.appspot.com",
+      storageBucket: "diwan-al-ajami.firebasestorage.app",
       messagingSenderId: "252336738977",
       appId: "1:252336738977:web:6888cf755f804ddb9356e0"
     };
@@ -137,20 +138,38 @@
 
     let username = localStorage.getItem("name") || "";
     if (username) {
-      nameDisplay.textContent = username;
-      nameInputDiv.style.display = 'none';
-      mainDiv.style.display = 'block';
+  nameDisplay.textContent = username;
+  nameInputDiv.style.display = 'none';
+  mainDiv.style.display = 'block';
+  checkAndAutoSetStatus(() => {
+    nameInputDiv.style.display = 'none';
+    mainDiv.style.display = 'block';
+  }, () => {
+    alert("أنت خارج نطاق الموقع، لم يتم تسجيل حضورك.");
+    localStorage.removeItem("name");
+    username = "";
+  });
     }
 
     window.saveName = function() {
-      username = usernameInput.value.trim();
-      if (!username) return;
-      localStorage.setItem("name", username);
-      nameDisplay.textContent = username;
-      nameInputDiv.style.display = 'none';
-      mainDiv.style.display = 'block';
+  username = usernameInput.value.trim();
+  if (!username) return;
+  localStorage.setItem("name", username);
+  nameDisplay.textContent = username;
+  nameInputDiv.style.display = 'none';
+  mainDiv.style.display = 'block';
+  checkAndAutoSetStatus(() => {
+    nameInputDiv.style.display = 'none';
+    mainDiv.style.display = 'block';
+  }, () => {
+    alert("أنت خارج نطاق الموقع، لم يتم تسجيل حضورك.");
+    localStorage.removeItem("name");
+    username = "";
+  });
+};
     };
-
+    ;
+      
     window.setStatus = function(status) {
       set(ref(db, 'presence/' + username), {
         status: status,
@@ -175,7 +194,7 @@
     }
 
     const presentList = document.getElementById("presentList");
-
+    
     let previousUsers = new Set();
     const presenceRef = ref(db, 'presence');
 
@@ -198,7 +217,7 @@
               : `${hours} ساعة`);
           li.textContent = `${user} - منذ ${timeText}`;
           currentUsers.add(user);
-
+          
           if (username) {
             const kickBtn = document.createElement("button");
             kickBtn.textContent = "❌ غادر";
@@ -208,11 +227,49 @@
           presentList.appendChild(li);
         }
       }
-
+      
       document.getElementById("countDisplay").textContent = currentUsers.size;
       previousUsers = currentUsers;
     });
   </script>
-  <footer style="margin-top: 50px; font-size: 0.9rem; opacity: 0.6;">جميع الحقوق محفوظة © أحمد آل ناصر</footer>
+<footer style="margin-top: 50px; font-size: 0.9rem; opacity: 0.6;">جميع الحقوق محفوظة © أحمد آل ناصر</footer>
+<script>
+function checkAndAutoSetStatus(successCallback, failureCallback) {
+  if (!navigator.geolocation) return;pos => {
+    const lat = pos.coords.latitude;
+    const lon = pos.coords.longitude;
+
+    const targetLat = 26.5689;
+    const targetLon = 49.9543;
+
+    const distance = getDistanceFromLatLonInMeters(lat, lon, targetLat, targetLon);
+    if (distance < 100) {
+      set(ref(db, 'presence/' + username), {
+        status: 'متواجد',
+        timestamp: Date.now()
+      });
+      if (typeof successCallback === 'function') successCallback();
+    } else {
+      if (typeof failureCallback === 'function') failureCallback();
+    });
+    } else {
+      alert("أنت خارج نطاق الموقع، لم يتم تسجيل حضورك تلقائيًا.");
+    }
+  });
+}
+
+function getDistanceFromLatLonInMeters(lat1, lon1, lat2, lon2) {
+  const R = 6371e3;
+  const φ1 = lat1 * Math.PI / 180;
+  const φ2 = lat2 * Math.PI / 180;
+  const Δφ = (lat2 - lat1) * Math.PI / 180;
+  const Δλ = (lon2 - lon1) * Math.PI / 180;
+  const a = Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
+            Math.cos(φ1) * Math.cos(φ2) *
+            Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
+}
+</script>
 </body>
 </html>
