@@ -59,11 +59,6 @@
       font-size: 0.9rem;
       border-radius: 5px;
     }
-    .extra-controls {
-      margin-top: 40px;
-      border-top: 1px solid #444;
-      padding-top: 20px;
-    }
     @media screen and (max-width: 600px) {
       h1 { font-size: 1.5rem; }
       button { width: 90%; }
@@ -87,8 +82,6 @@
     <div id="list">
       <h3>المتواجدون الآن: <span id="countDisplay">0</span></h3>
       <ul id="presentList"></ul>
-    </div>
-    
     </div>
   </div>
 
@@ -123,25 +116,22 @@
       nameDisplay.textContent = username;
       nameInputDiv.style.display = 'none';
       mainDiv.style.display = 'block';
-      checkAndAutoSetStatus(() => {
-  nameInputDiv.style.display = 'none';
-  mainDiv.style.display = 'block';
-}, () => {
-  alert("أنت خارج نطاق الموقع، لم يتم تسجيل حضورك.");
-  localStorage.removeItem("name");
-  username = "";
-});
-
-setInterval(() => {
-  if (username) {
-    checkAndAutoSetStatus(() => {}, () => {
-      set(ref(db, 'presence/' + username), {
-        status: 'غير متواجد',
-        timestamp: Date.now()
+      checkAndAutoSetStatus(() => {}, () => {
+        alert("أنت خارج نطاق الموقع، لم يتم تسجيل حضورك.");
+        localStorage.removeItem("name");
+        username = "";
       });
-    });
-  }
-}, 180000); // كل 10 دقائق
+
+      setInterval(() => {
+        if (username) {
+          checkAndAutoSetStatus(() => {}, () => {
+            set(ref(db, 'presence/' + username), {
+              status: 'غير متواجد',
+              timestamp: Date.now()
+            });
+          });
+        }
+      }, 180000);
     }
 
     window.saveName = function() {
@@ -165,43 +155,21 @@ setInterval(() => {
       mainDiv.style.display = 'block';
     };
 
-    window.setStatus = function(status) {
-      set(ref(db, 'presence/' + username), {
-        status: status,
-        timestamp: Date.now()
-      });
-    };
-
-    window.setOtherStatus = function(status) {
-      const otherName = document.getElementById("otherName").value.trim();
-      if (!otherName) return;
-      set(ref(db, 'presence/' + otherName), {
-        status: status,
-        timestamp: Date.now()
-      });
-    };
-
     function forceStatusOff(targetUser) {
-  set(ref(db, 'presence/' + targetUser), {
-    status: 'غير متواجد',
-    timestamp: Date.now()
-  });
-}
-
-function deleteUser(targetUser) {
-  set(ref(db, 'presence/' + targetUser), null);
-});
+      set(ref(db, 'presence/' + targetUser), {
+        status: 'غير متواجد',
+        timestamp: Date.now()
+      });
     }
 
     const presentList = document.getElementById("presentList");
-    let previousUsers = new Set();
     const presenceRef = ref(db, 'presence');
 
     onValue(presenceRef, (snapshot) => {
       const data = snapshot.val() || {};
       const entries = Object.entries(data);
       presentList.innerHTML = '';
-      const currentUsers = new Set();
+      let currentUsers = new Set();
       for (const [user, info] of entries) {
         if (info.status === 'متواجد') {
           const li = document.createElement("li");
@@ -220,7 +188,6 @@ function deleteUser(targetUser) {
           if (username) {
             const kickBtn = document.createElement("button");
             kickBtn.textContent = "❌ غادر";
-            
             kickBtn.onclick = () => forceStatusOff(user);
             li.appendChild(kickBtn);
           }
@@ -228,7 +195,6 @@ function deleteUser(targetUser) {
         }
       }
       document.getElementById("countDisplay").textContent = currentUsers.size;
-      previousUsers = currentUsers;
     });
 
     function checkAndAutoSetStatus(successCallback, failureCallback) {
