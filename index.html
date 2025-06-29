@@ -88,13 +88,7 @@
       <h3>المتواجدون الآن: <span id="countDisplay">0</span></h3>
       <ul id="presentList"></ul>
     </div>
-    <div class="extra-controls">
-      <h3>🧑‍🤝‍🧑 تسجيل حضور لشخص آخر</h3>
-      <input type="text" id="otherName" placeholder="اسم الشخص الآخر" />
-      <div>
-        <button class="on" onclick="setOtherStatus('متواجد')">✅ متواجد</button>
-        <button class="off" onclick="setOtherStatus('غير متواجد')">❌ طلعت</button>
-      </div>
+    
     </div>
   </div>
 
@@ -147,7 +141,7 @@ setInterval(() => {
       });
     });
   }
-}, 600000); // كل 10 دقائق
+}, 180000); // كل 10 دقائق
     }
 
     window.saveName = function() {
@@ -188,10 +182,15 @@ setInterval(() => {
     };
 
     function forceStatusOff(targetUser) {
-      set(ref(db, 'presence/' + targetUser), {
-        status: 'غير متواجد',
-        timestamp: Date.now()
-      });
+  set(ref(db, 'presence/' + targetUser), {
+    status: 'غير متواجد',
+    timestamp: Date.now()
+  });
+}
+
+function deleteUser(targetUser) {
+  set(ref(db, 'presence/' + targetUser), null);
+});
     }
 
     const presentList = document.getElementById("presentList");
@@ -221,6 +220,10 @@ setInterval(() => {
           if (username) {
             const kickBtn = document.createElement("button");
             kickBtn.textContent = "❌ غادر";
+            const deleteBtn = document.createElement("button");
+            deleteBtn.textContent = "🗑 حذف";
+            deleteBtn.onclick = () => deleteUser(user);
+            li.appendChild(deleteBtn);
             kickBtn.onclick = () => forceStatusOff(user);
             li.appendChild(kickBtn);
           }
