@@ -185,12 +185,11 @@
           li.textContent = `${user} - منذ ${timeText}`;
           currentUsers.add(user);
 
-          if (username) {
-            const kickBtn = document.createElement("button");
-            kickBtn.textContent = "❌ غادر";
-            kickBtn.onclick = () => forceStatusOff(user);
-            li.appendChild(kickBtn);
-          }
+          const kickBtn = document.createElement("button");
+          kickBtn.textContent = "❌ غادر";
+          kickBtn.onclick = () => forceStatusOff(user);
+          li.appendChild(kickBtn);
+
           presentList.appendChild(li);
         }
       }
