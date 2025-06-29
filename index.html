@@ -220,10 +220,7 @@ function deleteUser(targetUser) {
           if (username) {
             const kickBtn = document.createElement("button");
             kickBtn.textContent = "❌ غادر";
-            const deleteBtn = document.createElement("button");
-            deleteBtn.textContent = "🗑 حذف";
-            deleteBtn.onclick = () => deleteUser(user);
-            li.appendChild(deleteBtn);
+            
             kickBtn.onclick = () => forceStatusOff(user);
             li.appendChild(kickBtn);
           }
